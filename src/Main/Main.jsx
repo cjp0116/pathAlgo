@@ -2,23 +2,34 @@ import React, { Component } from "react";
 import Node from "./Node/Node";
 import NavigationBar from "./Header/NavigationBar";
 import { dijkstra, getNodesInShortestPathOrder } from "./Algorithms/dijkstra";
+import {
+  START_NODE_ROW,
+  START_NODE_COL,
+  FINISH_NODE_ROW,
+  FINISH_NODE_COL,
+  getInitialGrid,
+  getNewGridWithWallToggled
+
+} from "../Misc/rowsAndCols";
+import Modal from "../Shared/components/UIElements/Modal";
+import Button from "../Shared/components/UIElements/Button";
+import {djikstraText} from "../Misc/ModalTexts";
 import "./Main.css";
 
-const START_NODE_ROW = 10;
-const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 10;
-const FINISH_NODE_COL = 35;
 
 export default class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
       grid: [],
-      mouseIsPressed: false
+      mouseIsPressed: false,
+      route : "home",
+      showModal : true
     };
   }
 
   componentDidMount() {
+    this.setState({ grid : [] })
     const grid = getInitialGrid();
     this.setState({ grid });
   }
@@ -74,11 +85,22 @@ export default class Main extends Component {
   }
 
   clearPath() {
-    this.setState({ grid: [] });
     const grid = getInitialGrid();
-    this.setState({ grid });
+    this.setState({ grid : [] });
+    this.setState({ grid : grid})
+  }
+  
+  handleRouteChange = (route) => {
+    this.setState({
+      route : route
+    })
+    console.log(this.state.route)
   }
 
+  closeModalHandler() {
+    this.setState({ showModal : false })
+  }
+  
   render() {
     const { grid, mouseIsPressed } = this.state;
 
@@ -87,8 +109,19 @@ export default class Main extends Component {
         <NavigationBar
           onVisiualizePressed={() => this.visualizeDijkstra()}
           onClearPathPressed={() => this.clearPath()}
+          onRouteChange={() => this.handleRouteChange()}
         />
-
+        <Modal 
+          show={this.state.showModal}
+          onCancel={() => this.closeModalHandler()}
+          header="Djikstra's Algorithm"
+          headerClass="center"
+          footer={<Button danger onClick={() => this.closeModalHandler()}>Close</Button>}
+        >
+          <div className="center">
+            {djikstraText}
+          </div>
+        </Modal>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
@@ -120,39 +153,3 @@ export default class Main extends Component {
     );
   }
 }
-
-const getInitialGrid = () => {
-  const grid = [];
-  for (let row = 0; row < 20; row++) {
-    const currentRow = [];
-    for (let col = 0; col < 50; col++) {
-      currentRow.push(createNode(col, row));
-    }
-    grid.push(currentRow);
-  }
-  return grid;
-};
-
-const createNode = (col, row) => {
-  return {
-    col,
-    row,
-    isStart: row === START_NODE_ROW && col === START_NODE_COL,
-    isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
-    distance: Infinity,
-    isVisited: false,
-    isWall: false,
-    previousNode: null
-  };
-};
-
-const getNewGridWithWallToggled = (grid, row, col) => {
-  const newGrid = grid.slice();
-  const node = newGrid[row][col];
-  const newNode = {
-    ...node,
-    isWall: !node.isWall
-  };
-  newGrid[row][col] = newNode;
-  return newGrid;
-};
