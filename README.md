@@ -25,3 +25,7 @@ git clone the project and type `npm start` in the terminal.
 - Add A\* Search
 - Improve User Interface
 - Add Sorting Algo Vis (maybe?)
+
+## Include Additional UI
+- Created reusable Modal componenent.
+- Created React portals for backdrop.
