@@ -5,13 +5,6 @@ import Main from "./Main/Main";
 import BFS from "./Main/BFS";
 
 class App extends Component {
-   constructor(props) {
-      super(props);
-      this.state = {
-         modalShow: false
-      };
-   }
-
    render() {
       return (
          <React.Fragment>
